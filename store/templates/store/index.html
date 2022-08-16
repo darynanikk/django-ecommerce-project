@@ -16,6 +16,7 @@
 
     <link rel="stylesheet" href="{% static 'css/aos.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
 
     <script src="https://js.stripe.com/v3/"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
@@ -76,10 +77,8 @@
         </div>
       </nav>
     </header>
-
   {% block content %}
   {% endblock content %}
-
     <footer class="site-footer border-top">
       <div class="container">
         <div class="row">
@@ -157,8 +156,6 @@
 
   <script type="text/javascript">
       const user = '{{ request.user }}'
-
-
   </script>
   <script type="text/javascript">
       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -171,6 +168,7 @@
   <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
   <script src="{% static 'js/aos.js' %}"></script>
   <script src="{% static 'js/main.js' %}"></script>
-   <script type="text/javascript" src="{% static  'js/cart.js' %}"></script>
+  <script src="{% static  'js/cart.js' %}"></script>
+  <script src="{% static  'js/checkout.js' %}"></script>
   </body>
 </html>

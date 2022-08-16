@@ -1,5 +1,5 @@
 "use strict"
-
+console.log("cart")
 const updateBtns = document.getElementsByClassName('update-cart')
 
 for (let i = 0; i < updateBtns.length; i++) {

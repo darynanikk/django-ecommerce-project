@@ -8,15 +8,9 @@ urlpatterns = [
     path("about/", about, name='about'),
     path("contact/", contact, name='contact'),
     path("product/<slug:slug>/", ProductDetailView.as_view(), name='product'),
-
     # cart
     path("cart/", cart, name='cart'),
-
-    # payment
-    path('create-checkout-session/', ProcessCheckoutSessionView.as_view(), name='create-checkout-session'),
-    path('cancel/', CancelTemplateView.as_view(), name='cancel'),
-    path('success/', SuccessTemplateView.as_view(), name='success'),
-
-    #webhooks
-    path('webhooks/stripe/', stripe_webhook_view, name='stripe-webhook')
+    path('create-payment-intent/', StripeIntentView.as_view(), name='create-payment-intent'),
+    path('webhooks/stripe/', stripe_webhook, name='stripe-webhook'),
+    path('checkout/', ProductCheckoutPageView.as_view(), name='checkout'),
 ]

@@ -8,7 +8,6 @@
         </div>
       </div>
     </div>
-
     <div class="site-section">
       <div class="container">
         <div class="row mb-5">
@@ -226,78 +225,28 @@
                       </tr>
                     </tbody>
                   </table>
-
-                  <div class="border p-3 mb-3">
-                    <h3 class="h6 mb-0"><a class="d-block" data-toggle="collapse" href="#collapsebank" role="button" aria-expanded="false" aria-controls="collapsebank">Direct Bank Transfer</a></h3>
-
-                    <div class="collapse" id="collapsebank">
-                      <div class="py-2">
-                        <p class="mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="border p-3 mb-3">
-                    <h3 class="h6 mb-0"><a class="d-block" data-toggle="collapse" href="#collapsecheque" role="button" aria-expanded="false" aria-controls="collapsecheque">Cheque Payment</a></h3>
-
-                    <div class="collapse" id="collapsecheque">
-                      <div class="py-2">
-                        <p class="mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="border p-3 mb-5">
-                    <h3 class="h6 mb-0"><a class="d-block" data-toggle="collapse" href="#collapsepaypal" role="button" aria-expanded="false" aria-controls="collapsepaypal">Paypal</a></h3>
-
-                    <div class="collapse" id="collapsepaypal">
-                      <div class="py-2">
-                        <p class="mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                       <form action="{% url 'create-checkout-session' %}" method="POST">
-                            {% csrf_token %}
-                            <button class="btn btn-primary btn-lg py-3 btn-block" type="submit" id="checkout-button">Checkout</button>
-                       </form>
-                  </div>
+                       <form id="payment-form">
+                            <input type="text" id="email" placeholder="Email address" />
+                            <div id="card-element"><!--Stripe.js injects the Card Element--></div>
+                            <button id="payment-submit">
+                              <div class="spinner hidden" id="spinner"></div>
+                              <span id="button-text">Pay</span>
+                            </button>
+                            <p id="card-error" role="alert"></p>
+                            <p class="result-message hidden">
+                              Payment succeeded, see the result in your
+                              <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+                            </p>
+                        </form>
+                    {% csrf_token %}
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-        <!-- </form> -->
       </div>
     </div>
-{#    <script type="text/javascript">#}
-{#    const stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}')#}
-{#    const checkoutButton = document.getElementById('checkout-button')#}
-{##}
-{#    checkoutButton.addEventListener('click', function (e){#}
-{#        fetch("{% url 'create-checkout-session' %}", {#}
-{#            method: "POST",#}
-{#            headers: {#}
-{#                'X-CSRFToken': csrftoken#}
-{#            }#}
-{#        })#}
-{#            .then(function(res){#}
-{#                return res.json()#}
-{#            })#}
-{#            .then(function(session){#}
-{#                return stripe.redirectToCheckout({#}
-{#                    sessionId : session.id,#}
-{#                    })#}
-{#            })#}
-{#            .then(function(res){#}
-{#                if (res.error) {#}
-{#                    alert(res.error.message)#}
-{#                }#}
-{#            })#}
-{#            .catch(function(err){#}
-{#                console.log("Error:", err)#}
-{#            })#}
-{#    })#}
-{#    </script>#}
+    <script type="text/javascript">
+    const stripePublicKey = '{{ STRIPE_PUBLIC_KEY  }}'
+    </script>
 {% endblock content %}
