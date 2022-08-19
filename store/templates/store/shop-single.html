@@ -48,7 +48,7 @@
             </div>
             <p>
                 {% csrf_token %}
-                <button data-product="{{ item.slug }}" data-action="add" href="{% url 'cart' %}" class="buy-now btn btn-sm btn-primary update-cart">Add To Cart</button>
+                <button data-product="{{ item.slug }}" data-action="add" href="{% url 'store:cart' %}" class="buy-now btn btn-sm btn-primary update-cart">Add To Cart</button>
             </p>
           </div>
         </div>

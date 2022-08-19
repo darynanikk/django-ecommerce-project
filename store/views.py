@@ -9,7 +9,6 @@ from django.shortcuts import render, redirect
 from django.views import View
 from .cart import Cart
 from django.views.generic import ListView, DetailView, TemplateView
-from customer.models import Customer
 from store.models import Item, Order, OrderItem
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -46,9 +45,9 @@ class ProductDetailView(DetailView):
 def cart(request):
     context = {}
     method = request.method
-    customer, created = Customer.objects.get_or_create(user=request.user)
+    customer = request.user
 
-    if customer.user.is_authenticated:
+    if customer.is_authenticated:
         order, created = Order.objects.get_or_create(customer=customer, ordered=False)
 
     else:
@@ -86,20 +85,12 @@ def contact(request):
     return render(request, 'store/contact.html', context)
 
 
-class SuccessTemplateView(TemplateView):
-    template_name = 'store/thankyou.html'
-
-
-class CancelTemplateView(TemplateView):
-    template_name = 'store/cancel.html'
-
-
 class ProductCheckoutPageView(TemplateView):
     template_name = "store/checkout.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProductCheckoutPageView, self).get_context_data(**kwargs)
-        customer = self.request.customer
+        customer = self.request.user
         order = Order.objects.get(customer=customer)
         context.update({
             "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY,
@@ -166,7 +157,6 @@ class StripeIntentView(View):
                     "order_id": order.id,
                 },
             )
-            print(intent)
             return JsonResponse({
                 'clientSecret': intent['client_secret']
             })

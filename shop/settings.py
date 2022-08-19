@@ -17,7 +17,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -29,7 +28,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "store",
-    "customer"
+    "customer",
+    "phonenumber_field"
 ]
 
 MIDDLEWARE = [
@@ -63,7 +63,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "shop.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -73,7 +72,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -93,7 +91,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -104,7 +101,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -122,6 +118,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR / 'static/images')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-STRIPE_SECRET_KEY="sk_test_51LWJgoF2YQvlQ4aeDIMxc53WGCSDucnLbUv3f3tdmohpQGpCoD5JnbVR0tiP8NyXRXoevLfVLD5xULHjWeU0GRs6004Pkyq9M5"
-STRIPE_PUBLIC_KEY="pk_test_51LWJgoF2YQvlQ4aeBfK1PNJxdPmpgsxqbuBqpFzFqo8HElKG7RUK1MqvSfD3MVWNRUghG1GO3Saq2pPVHN1v4gsQ00ZhEAMrNE"
-STRIPE_WEBHOOK_SECRET="whsec_c6ccb3b147b5bc7fc67765fd53f1b7058792c703595ee3bd0badee5fc8d94e34"
+# Stripe secrets
+STRIPE_SECRET_KEY = "sk_test_51LWJgoF2YQvlQ4aeDIMxc53WGCSDucnLbUv3f3tdmohpQGpCoD5JnbVR0tiP8NyXRXoevLfVLD5xULHjWeU0GRs6004Pkyq9M5"
+STRIPE_PUBLIC_KEY = "pk_test_51LWJgoF2YQvlQ4aeBfK1PNJxdPmpgsxqbuBqpFzFqo8HElKG7RUK1MqvSfD3MVWNRUghG1GO3Saq2pPVHN1v4gsQ00ZhEAMrNE"
+STRIPE_WEBHOOK_SECRET = "whsec_c6ccb3b147b5bc7fc67765fd53f1b7058792c703595ee3bd0badee5fc8d94e34"
+
+AUTH_USER_MODEL = 'customer.Customer'

@@ -1,5 +1,3 @@
-from django.urls import reverse
-#from phonenumber_field.modelfields import PhoneNumberField
 from django.db import models
 
 from customer.models import Customer
@@ -19,7 +17,7 @@ class Item(models.Model):
 
 class OrderItem(models.Model):
     customer = models.ForeignKey(Customer,
-                             on_delete=models.CASCADE, null=True, blank=True)
+                                 on_delete=models.CASCADE, null=True, blank=True)
     ordered = models.BooleanField(default=False)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
@@ -38,10 +36,10 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer,
-                             on_delete=models.SET_NULL, null=True, blank=True)
+                                 on_delete=models.SET_NULL, null=True, blank=True)
     items = models.ManyToManyField(OrderItem)
     start_date = models.DateTimeField(auto_now_add=True)
-    ordered_date = models.DateTimeField()
+    ordered_date = models.DateTimeField(auto_now_add=True)
     ordered = models.BooleanField(default=False)
     shipping_address = models.ForeignKey(
         'Address', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
@@ -68,7 +66,7 @@ class Order(models.Model):
 
 class Address(models.Model):
     customer = models.ForeignKey(Customer,
-                             on_delete=models.SET_NULL, null=True, blank=True)
+                                 on_delete=models.SET_NULL, null=True, blank=True)
     street_address = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     zip = models.CharField(max_length=100)
