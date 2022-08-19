@@ -21,7 +21,6 @@ class HomeListView(ListView):
 
     def get_queryset(self):
         item_qs = super(HomeListView, self).get_queryset()
-        print(self.request.order)
         try:
             # TODO filter featured items (anonymous user\ registered)
             featured_items = item_qs.filter(user=self.request)
@@ -100,9 +99,11 @@ class ProductCheckoutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductCheckoutPageView, self).get_context_data(**kwargs)
+        customer = self.request.customer
+        order = Order.objects.get(customer=customer)
         context.update({
             "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY,
-            "order": self.request.order
+            "order": order
         })
         return context
 
@@ -124,61 +125,50 @@ def stripe_webhook(request):
         # Invalid signature
         return HttpResponse(status=400)
 
-    # Handle the checkout.session.completed event
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-
-        customer_email = session["customer_details"]["email"]
-        product_id = session["metadata"]["product_id"]
-
-        product = Item.objects.get(slug=product_id)
-
-        send_mail(
-            subject="Here is your product",
-            message=f"Thanks for your purchase. Here is the product you ordered. The URL is {product.url}",
-            recipient_list=[customer_email],
-            from_email="matt@test.com"
-        )
-
-        # TODO - decide whether you want to send the file or the URL
-
-    elif event["type"] == "payment_intent.succeeded":
+    if event["type"] == "payment_intent.succeeded":
         intent = event['data']['object']
 
         stripe_customer_id = intent["customer"]
         stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
 
         customer_email = stripe_customer['email']
-        product_id = intent["metadata"]["product_id"]
+        order_id = intent["metadata"]["order_id"]
+        order = Order.objects.get(id=order_id)
 
-        product = Item.objects.get(slug=product_id)
+        message = 'Thanks for your purchase. Here is the product(s) you ordered.'
+
+        for order in order.items.all():
+            message += f' {order.item.title}'
 
         send_mail(
-            subject="Here is your product",
-            message=f"Thanks for your purchase. Here is the product you ordered. The URL is {product.url}",
+            subject="Here is your product(s)",
+            message=message,
             recipient_list=[customer_email],
-            from_email="matt@test.com"
+            from_email="admin@mail.com"
         )
 
-    return HttpResponse(status=200)
+        return HttpResponse(status=200)
 
 
 class StripeIntentView(View):
     def post(self, request, *args, **kwargs):
         try:
-            customer = stripe.Customer.create(email="daryandobro@gmail.com")
-            order = request.order
-            product = order.items.all()[0]
+            body = request.body
+            data = json.loads(body.decode('utf-8'))
+            customer = stripe.Customer.create(email=data.get('email'))
+            # if user is logged in
+            order = Order.objects.get(customer=request.customer)
             intent = stripe.PaymentIntent.create(
-                amount=300,
+                amount=int(order.get_cart_total_price),
                 currency='usd',
                 customer=customer['id'],
                 metadata={
-                    "product_id": product.id
+                    "order_id": order.id,
                 },
             )
+            print(intent)
             return JsonResponse({
                 'clientSecret': intent['client_secret']
             })
         except Exception as e:
-            return JsonResponse({ 'error': str(e) })
+            return JsonResponse({'error': str(e)})

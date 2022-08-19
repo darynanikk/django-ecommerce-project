@@ -58,7 +58,6 @@ class Order(models.Model):
     @property
     def get_cart_total_price(self):
         order_items = self.items.all()
-        print(order_items)
         return sum([item.get_total_price for item in order_items])
 
     @property

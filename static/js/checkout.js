@@ -91,7 +91,7 @@ const orderComplete = function(paymentIntentId) {
 // Show the customer the error from Stripe if their card fails to charge
 const showError = function(errorMsgText) {
   loading(false);
-  var errorMsg = document.querySelector("#card-error");
+  const errorMsg = document.querySelector("#card-error");
   errorMsg.textContent = errorMsgText;
   setTimeout(function() {
     errorMsg.textContent = "";
