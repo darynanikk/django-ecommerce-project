@@ -51,7 +51,7 @@ class CustomerChangeForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        fields = ('email', 'password', 'first_name', 'last_name', 'phone_number', 'is_active', 'is_admin')
+        fields = "__all__"
 
 
 class UserAdmin(BaseUserAdmin):

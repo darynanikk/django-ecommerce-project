@@ -20,6 +20,9 @@
     />
 
     <style>
+        .btn-primary {
+            background-color: #7971ea;;
+        }
         .login--wrapper {
             display: flex;
             align-items: center;
@@ -75,7 +78,7 @@
                   <div class="text-center text-lg-start mt-4 pt-2">
                     <button type="submit" class="btn btn-primary btn-lg"
                       style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
-                    <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="{% url 'register' %}"
+                    <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="{% url 'customer:register' %}"
                         class="link-danger">Register</a>
                     </p>
                   </div>
@@ -98,7 +101,7 @@
                           <div class="text-center text-lg-start mt-4 pt-2">
                             <button type="submit" class="btn btn-primary btn-lg"
                               style="padding-left: 2.5rem; padding-right: 2.5rem;">Register</button>
-                            <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="{% url 'login' %}"
+                            <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="{% url 'customer:login' %}"
                                 class="link-danger">Login</a>
                             </p>
                           </div>

@@ -3,6 +3,7 @@ console.log("checkout")
 // Create an instance of the Stripe object with your publishable API key
 const stripe = Stripe(stripePublicKey)
 
+console.log(user)
 // Disable the button until we have Stripe set up on the page
 document.getElementById("payment-submit").disabled = true;
 
@@ -35,6 +36,19 @@ const form = document.getElementById("payment-form");
 form.addEventListener("submit", function(event) {
   event.preventDefault();
   const url = '/create-payment-intent/'
+  let data = {
+    country: document.getElementById('c_country').value,
+    city: document.getElementById('c_state_country').value,
+    street_address: document.getElementById('c_address').value,
+    postal_code: document.getElementById('c_postal_zip').value,
+  }
+  if (user === 'AnonymousUser') {
+   data['email'] = `${document.getElementById('c_email').value}`
+    data['phone_number'] = `${document.getElementById('c_phone').value}`
+  } else {
+    data['email'] = user
+    data['phone_number'] = customer_phone_number
+  }
   // Complete payment when the submit button is clicked
   fetch(url, {
     method: "POST",
@@ -42,9 +56,7 @@ form.addEventListener("submit", function(event) {
       "Content-Type": "application/json",
       'X-CSRFToken': csrftoken
     },
-    body: JSON.stringify({
-      email: document.getElementById('email').value
-    })
+    body: JSON.stringify(data)
   })
     .then(function(result) {
       return result.json();

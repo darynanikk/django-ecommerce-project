@@ -23,7 +23,7 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    return redirect('login')
+    return redirect('customer:login')
 
 
 def register_user(request):
@@ -34,11 +34,13 @@ def register_user(request):
         form = CustomerCreationForm(request.POST)
         if form.is_valid():
             customer = form.save(commit=False)
-            customer.save()
+            password = form.cleaned_data.get('password1')
+            customer.set_password(password)
+            customer = customer.save()
 
             if customer is not None:
                 login(request, customer)
-                return redirect('login')
+                return redirect('customer:login')
 
     context = {'form': form, 'page': page}
     return render(request, 'customer/login_register.html', context)

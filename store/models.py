@@ -36,7 +36,7 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer,
-                                 on_delete=models.SET_NULL, null=True, blank=True)
+                                 on_delete=models.CASCADE, null=True, blank=True)
     items = models.ManyToManyField(OrderItem)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField(auto_now_add=True)

@@ -10,6 +10,7 @@ from django.views import View
 from .cart import Cart
 from django.views.generic import ListView, DetailView, TemplateView
 from store.models import Item, Order, OrderItem
+from .filters import item_filter
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -25,12 +26,18 @@ class HomeListView(ListView):
             featured_items = item_qs.filter(user=self.request)
         except:
             pass
-        return super(HomeListView, self).get_queryset()
+        return item_qs
 
 
-class ShopListView(ListView):
+class ShopListView(View):
     model = Item
+    context = {}
     template_name = 'store/shop.html'
+
+    def get(self, request, *args, **kwargs):
+        qs = item_filter(request)
+        self.context['items'] = qs
+        return render(request, self.template_name, self.context)
 
 
 class ProductDetailView(DetailView):
@@ -51,6 +58,7 @@ def cart(request):
         order, created = Order.objects.get_or_create(customer=customer, ordered=False)
 
     else:
+        pass
         # TODO handle later
         device = request.COOKIES['device']
         return JsonResponse({"cool": "cool"}, safe=False)
@@ -92,9 +100,11 @@ class ProductCheckoutPageView(TemplateView):
         context = super(ProductCheckoutPageView, self).get_context_data(**kwargs)
         customer = self.request.user
         order = Order.objects.get(customer=customer)
+        order_items = order.items.all()
         context.update({
             "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY,
-            "order": order
+            "order": order,
+            "order_items": order_items
         })
         return context
 
@@ -146,17 +156,35 @@ class StripeIntentView(View):
         try:
             body = request.body
             data = json.loads(body.decode('utf-8'))
-            customer = stripe.Customer.create(email=data.get('email'))
+            if request.user.is_authenticated:
+                email = str(request.user)
+            else:
+                email = data.get('email')
+            customer = stripe.Customer.create(email=email)
             # if user is logged in
-            order = Order.objects.get(customer=request.customer)
+            order = Order.objects.get(customer=request.user)
+
+            shipping = {
+                'address': {
+                    'country': data.get('country'),
+                    'city': data.get('city'),
+                    'postal_code': data.get('postal_code'),
+                    'line1': data.get('street_address')
+                },
+                'name': email,
+                'phone': data.get('phone_number'),
+            }
             intent = stripe.PaymentIntent.create(
                 amount=int(order.get_cart_total_price),
                 currency='usd',
                 customer=customer['id'],
+                shipping=shipping,
+                receipt_email=email,
                 metadata={
                     "order_id": order.id,
                 },
             )
+            print(intent)
             return JsonResponse({
                 'clientSecret': intent['client_secret']
             })
