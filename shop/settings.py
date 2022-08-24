@@ -1,5 +1,8 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,10 +13,10 @@ DOMAIN = "http://127.0.0.1:8000"
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-1l=q+we=ui-&g-b+$7^c6d&yy1@^&@updg24n@wh44j+0wd603"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(os.environ.get('DEBUG')) == "1"
 
 ALLOWED_HOSTS = []
 
@@ -26,7 +29,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "store",
     "customer",
     "phonenumber_field",
@@ -68,14 +70,39 @@ WSGI_APPLICATION = "shop.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+DB_USERNAME = os.getenv("POSTGRES_USER", "")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "")
+DB_DATABASE = os.getenv("POSTGRES_DB", "")
+DB_HOST = os.getenv("POSTGRES_HOST", "")
+DB_PORT = os.getenv("POSTGRES_PORT", "")
+
+DB_IS_AVIAL = all([
+    DB_USERNAME,
+    DB_PASSWORD,
+    DB_DATABASE,
+    DB_HOST,
+    DB_PORT
+])
+
+POSTGRES_READY = str(os.environ.get('POSTGRES_READY')) == "1"
+
+if DB_IS_AVIAL and POSTGRES_READY:
+    DATABASES = {
+        "default": {
+            "ENGINE": "",
+            "NAME": DB_DATABASE,
+            "USER": DB_USERNAME,
+            "PASSWORD": DB_PASSWORD,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -107,21 +134,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
-MEDIA_URL = '/images/'
+MEDIA_URL = "/images/"
 
-MEDIA_ROOT = os.path.join(BASE_DIR / 'static/images')
+MEDIA_ROOT = os.path.join(BASE_DIR / "static/images")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Stripe secrets
-STRIPE_SECRET_KEY = "sk_test_51LWJgoF2YQvlQ4aeDIMxc53WGCSDucnLbUv3f3tdmohpQGpCoD5JnbVR0tiP8NyXRXoevLfVLD5xULHjWeU0GRs6004Pkyq9M5"
-STRIPE_PUBLIC_KEY = "pk_test_51LWJgoF2YQvlQ4aeBfK1PNJxdPmpgsxqbuBqpFzFqo8HElKG7RUK1MqvSfD3MVWNRUghG1GO3Saq2pPVHN1v4gsQ00ZhEAMrNE"
-STRIPE_WEBHOOK_SECRET = "whsec_c6ccb3b147b5bc7fc67765fd53f1b7058792c703595ee3bd0badee5fc8d94e34"
+STRIPE_SECRET_KEY = "secret"
+STRIPE_PUBLIC_KEY = "secret"
+STRIPE_WEBHOOK_SECRET = (
+    "secret"
+)
 
-AUTH_USER_MODEL = 'customer.Customer'
+AUTH_USER_MODEL = "customer.Customer"

@@ -1,9 +1,9 @@
 import json
 import stripe
+import os
 
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
-from shop import settings
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
@@ -12,12 +12,16 @@ from django.views.generic import ListView, DetailView, TemplateView
 from store.models import Item, Order, OrderItem
 from .filters import item_filter, ItemsFilter
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+from dotenv import load_dotenv
+
+load_dotenv()
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 
 
 class HomeListView(ListView):
     model = Order
-    template_name = 'store/main.html'
+    template_name = "store/main.html"
 
     def get_queryset(self):
         item_qs = super(HomeListView, self).get_queryset()
@@ -32,18 +36,18 @@ class HomeListView(ListView):
 class ShopListView(View):
     model = Item
     context = {}
-    template_name = 'store/shop.html'
+    template_name = "store/shop.html"
 
     def get(self, request, *args, **kwargs):
         qs = item_filter(request)
-        self.context['items'] = qs
-        self.context['filter'] = ItemsFilter(request.GET, queryset=qs)
+        self.context["items"] = qs
+        self.context["filter"] = ItemsFilter(request.GET, queryset=qs)
         return render(request, self.template_name, self.context)
 
 
 class ProductDetailView(DetailView):
     model = Item
-    template_name = 'store/shop-single.html'
+    template_name = "store/shop-single.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,37 +65,46 @@ def cart(request):
     else:
         pass
         # TODO handle later
-        device = request.COOKIES['device']
+        device = request.COOKIES["device"]
         return JsonResponse({"cool": "cool"}, safe=False)
 
-    if method != 'GET':
+    if method != "GET":
         data = json.loads(request.body)
-        product_id = data['ProductId']
-        quantity = data['Quantity']
+        product_id = data["ProductId"]
+        quantity = data["Quantity"]
         item, created = Item.objects.get_or_create(slug=product_id)
-        order_item, created = OrderItem.objects.get_or_create(customer=customer, ordered=False, item=item)
-        c = Cart(item=item, order=order, customer=customer, quantity=quantity, order_item=order_item, created=created)
+        order_item, created = OrderItem.objects.get_or_create(
+            customer=customer, ordered=False, item=item
+        )
+        c = Cart(
+            item=item,
+            order=order,
+            customer=customer,
+            quantity=quantity,
+            order_item=order_item,
+            created=created,
+        )
 
-        if method == 'POST':
+        if method == "POST":
             c.add_to_cart()
-        elif method == 'PUT':
+        elif method == "PUT":
             c.update_cart()
-        elif method == 'DELETE':
+        elif method == "DELETE":
             c.remove_from_cart()
 
-    context['order_items'] = order.items.all()
-    context['order'] = order
-    return render(request, 'store/cart.html', context)
+    context["order_items"] = order.items.all()
+    context["order"] = order
+    return render(request, "store/cart.html", context)
 
 
 def about(request):
     context = {}
-    return render(request, 'store/about.html', context)
+    return render(request, "store/about.html", context)
 
 
 def contact(request):
     context = {}
-    return render(request, 'store/contact.html', context)
+    return render(request, "store/contact.html", context)
 
 
 class ProductCheckoutPageView(TemplateView):
@@ -102,23 +115,25 @@ class ProductCheckoutPageView(TemplateView):
         customer = self.request.user
         order = Order.objects.get(customer=customer)
         order_items = order.items.all()
-        context.update({
-            "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY,
-            "order": order,
-            "order_items": order_items
-        })
+        context.update(
+            {
+                "STRIPE_PUBLIC_KEY": os.getenv("STRIPE_PUBLIC_KEY", ""),
+                "order": order,
+                "order_items": order_items,
+            }
+        )
         return context
 
 
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
     event = None
 
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            payload, sig_header, os.getenv("STRIPE_WEBHOOK_SECRET", "")
         )
     except ValueError as e:
         # Invalid payload
@@ -128,25 +143,25 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
 
     if event["type"] == "payment_intent.succeeded":
-        intent = event['data']['object']
+        intent = event["data"]["object"]
 
         stripe_customer_id = intent["customer"]
         stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
 
-        customer_email = stripe_customer['email']
+        customer_email = stripe_customer["email"]
         order_id = intent["metadata"]["order_id"]
         order = Order.objects.get(id=order_id)
 
-        message = 'Thanks for your purchase. Here is the product(s) you ordered.'
+        message = "Thanks for your purchase. Here is the product(s) you ordered."
 
         for order in order.items.all():
-            message += f' {order.item.title}'
+            message += f" {order.item.title}"
 
         send_mail(
             subject="Here is your product(s)",
             message=message,
             recipient_list=[customer_email],
-            from_email="admin@mail.com"
+            from_email="admin@mail.com",
         )
 
         return HttpResponse(status=200)
@@ -156,29 +171,29 @@ class StripeIntentView(View):
     def post(self, request, *args, **kwargs):
         try:
             body = request.body
-            data = json.loads(body.decode('utf-8'))
+            data = json.loads(body.decode("utf-8"))
             if request.user.is_authenticated:
                 email = str(request.user)
             else:
-                email = data.get('email')
+                email = data.get("email")
             customer = stripe.Customer.create(email=email)
             # if user is logged in
             order = Order.objects.get(customer=request.user)
 
             shipping = {
-                'address': {
-                    'country': data.get('country'),
-                    'city': data.get('city'),
-                    'postal_code': data.get('postal_code'),
-                    'line1': data.get('street_address')
+                "address": {
+                    "country": data.get("country"),
+                    "city": data.get("city"),
+                    "postal_code": data.get("postal_code"),
+                    "line1": data.get("street_address"),
                 },
-                'name': email,
-                'phone': data.get('phone_number'),
+                "name": email,
+                "phone": data.get("phone_number"),
             }
             intent = stripe.PaymentIntent.create(
                 amount=int(order.get_cart_total_price),
-                currency='usd',
-                customer=customer['id'],
+                currency="usd",
+                customer=customer["id"],
                 shipping=shipping,
                 receipt_email=email,
                 metadata={
@@ -186,8 +201,6 @@ class StripeIntentView(View):
                 },
             )
             print(intent)
-            return JsonResponse({
-                'clientSecret': intent['client_secret']
-            })
+            return JsonResponse({"clientSecret": intent["client_secret"]})
         except Exception as e:
-            return JsonResponse({'error': str(e)})
+            return JsonResponse({"error": str(e)})

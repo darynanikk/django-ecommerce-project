@@ -8,6 +8,8 @@ django-phonenumber-field==6.3.0
 idna==3.3
 phonenumbers==8.12.54
 Pillow==9.2.0
+psycopg2-binary==2.9.3
+python-dotenv==0.20.0
 requests==2.28.1
 sqlparse==0.4.2
 stripe==4.0.2
