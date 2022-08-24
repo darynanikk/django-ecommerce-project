@@ -4,7 +4,19 @@ from customer.models import Customer
 
 
 class Item(models.Model):
+    SIZES_CHOICES = [('S', 'Small'), ('M', 'Medium'), ('L', 'Large')]
+    CATEGORIES_CHOICES = [('M', 'Men'), ('W', 'Women'), ('Ch', 'Children')]
+    FAVORITE_COLORS_CHOICES = [
+        ('blue', 'Blue'),
+        ('green', 'Green'),
+        ('red', 'Red'),
+        ('purple', 'Purple')
+    ]
+
     title = models.CharField(max_length=100)
+    categories = models.CharField(max_length=25, choices=CATEGORIES_CHOICES, null=True, blank=True)
+    sizes = models.CharField(max_length=25, choices=SIZES_CHOICES, null=True, blank=True)
+    colours = models.CharField(max_length=25, choices=FAVORITE_COLORS_CHOICES, null=True, blank=True)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
     image = models.ImageField(null=True, blank=True)

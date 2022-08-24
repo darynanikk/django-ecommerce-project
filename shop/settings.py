@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     "store",
     "customer",
     "phonenumber_field",
-    "django_filters"
+    "django_filters",
 ]
 
 MIDDLEWARE = [

@@ -10,7 +10,7 @@ from django.views import View
 from .cart import Cart
 from django.views.generic import ListView, DetailView, TemplateView
 from store.models import Item, Order, OrderItem
-from .filters import item_filter
+from .filters import item_filter, ItemsFilter
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -37,6 +37,7 @@ class ShopListView(View):
     def get(self, request, *args, **kwargs):
         qs = item_filter(request)
         self.context['items'] = qs
+        self.context['filter'] = ItemsFilter(request.GET, queryset=qs)
         return render(request, self.template_name, self.context)
 
 
