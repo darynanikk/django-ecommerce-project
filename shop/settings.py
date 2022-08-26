@@ -7,7 +7,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DOMAIN = "http://127.0.0.1:8000"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -16,9 +15,9 @@ DOMAIN = "http://127.0.0.1:8000"
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str(os.environ.get('DEBUG')) == "1"
+DEBUG = str(os.environ.get("DEBUG")) == "1"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # Application definition
 
@@ -37,6 +36,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -69,12 +69,6 @@ WSGI_APPLICATION = "shop.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.sqlite3",
-    #     "NAME": BASE_DIR / "db.sqlite3",
-    # }
-}
 
 DB_USERNAME = os.getenv("POSTGRES_USER", "")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "")
@@ -82,25 +76,19 @@ DB_DATABASE = os.getenv("POSTGRES_DB", "")
 DB_HOST = os.getenv("POSTGRES_HOST", "")
 DB_PORT = os.getenv("POSTGRES_PORT", "")
 
-DB_IS_AVIAL = all([
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_DATABASE,
-    DB_HOST,
-    DB_PORT
-])
+DB_IS_AVIAL = all([DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_HOST, DB_PORT])
 
-POSTGRES_READY = str(os.environ.get('POSTGRES_READY')) == "1"
+POSTGRES_READY = str(os.environ.get("POSTGRES_READY")) == "1"
 
 if DB_IS_AVIAL and POSTGRES_READY:
     DATABASES = {
         "default": {
-            "ENGINE": "",
+            "ENGINE": "django.db.backends.postgresql",
             "NAME": DB_DATABASE,
             "USER": DB_USERNAME,
             "PASSWORD": DB_PASSWORD,
             "HOST": DB_HOST,
-            "PORT": DB_PORT
+            "PORT": DB_PORT,
         }
     }
 
@@ -144,11 +132,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR / "static/images")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 # Stripe secrets
 STRIPE_SECRET_KEY = "secret"
 STRIPE_PUBLIC_KEY = "secret"
-STRIPE_WEBHOOK_SECRET = (
-    "secret"
-)
+STRIPE_WEBHOOK_SECRET = "secret"
 
 AUTH_USER_MODEL = "customer.Customer"
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
