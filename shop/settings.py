@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -79,11 +81,12 @@ DB_IS_AVIAL = all([DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_HOST, DB_PORT])
 
 POSTGRES_READY = str(os.environ.get("POSTGRES_READY")) == "1"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-    }
-}
+DATABASES = {'default': dj_database_url.config
+(
+    default='postgres://radbkenzlghkyf:bd4723fd076a87008ebdc81f263d6dd35bfaba39e277ef9f668b240b4c6994a2@ec2-44-205-112-253.compute-1.amazonaws.com:5432/d1sv7etml5291g'
+)}
+
+
 # if DB_IS_AVIAL and POSTGRES_READY:
 #     DATABASES = {
 #         "default": {
