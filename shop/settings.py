@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "store",
     "customer",
@@ -80,24 +81,28 @@ DB_PORT = os.getenv("POSTGRES_PORT", "")
 DB_IS_AVIAL = all([DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_HOST, DB_PORT])
 
 POSTGRES_READY = str(os.environ.get("POSTGRES_READY")) == "1"
+HEROKU_READY = True
 
-DATABASES = {'default': dj_database_url.config
-(
-    default='postgres://radbkenzlghkyf:bd4723fd076a87008ebdc81f263d6dd35bfaba39e277ef9f668b240b4c6994a2@ec2-44-205-112-253.compute-1.amazonaws.com:5432/d1sv7etml5291g'
-)}
-
-
-# if DB_IS_AVIAL and POSTGRES_READY:
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.postgresql",
-#             "NAME": DB_DATABASE,
-#             "USER": DB_USERNAME,
-#             "PASSWORD": DB_PASSWORD,
-#             "HOST": DB_HOST,
-#             "PORT": DB_PORT,
-#         }
-#     }
+if POSTGRES_READY:
+    if HEROKU_READY:
+        DATABASES = {
+            'default': dj_database_url.
+            config(
+                default='''postgres://radbkenzlghkyf:bd4723fd076a87008ebdc81f263d6dd35bfaba39e277ef9f668b240b4c6994a2
+                        @ec2-44-205-112-253.compute-1.amazonaws.com:5432/d1sv7etml5291g'''
+            )
+        }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": DB_DATABASE,
+                "USER": DB_USERNAME,
+                "PASSWORD": DB_PASSWORD,
+                "HOST": DB_HOST,
+                "PORT": DB_PORT,
+            }
+        }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -136,7 +141,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 MEDIA_URL = "/images/"
 MEDIA_ROOT = os.path.join(BASE_DIR / "static/images")
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Stripe secrets
 STRIPE_SECRET_KEY = "secret"
