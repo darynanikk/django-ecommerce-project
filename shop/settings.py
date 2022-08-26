@@ -141,4 +141,3 @@ STRIPE_WEBHOOK_SECRET = "secret"
 
 AUTH_USER_MODEL = "customer.Customer"
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
