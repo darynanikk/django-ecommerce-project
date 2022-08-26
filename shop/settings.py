@@ -7,7 +7,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -80,17 +79,22 @@ DB_IS_AVIAL = all([DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_HOST, DB_PORT])
 
 POSTGRES_READY = str(os.environ.get("POSTGRES_READY")) == "1"
 
-if DB_IS_AVIAL and POSTGRES_READY:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": DB_DATABASE,
-            "USER": DB_USERNAME,
-            "PASSWORD": DB_PASSWORD,
-            "HOST": DB_HOST,
-            "PORT": DB_PORT,
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
     }
+}
+# if DB_IS_AVIAL and POSTGRES_READY:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.postgresql",
+#             "NAME": DB_DATABASE,
+#             "USER": DB_USERNAME,
+#             "PASSWORD": DB_PASSWORD,
+#             "HOST": DB_HOST,
+#             "PORT": DB_PORT,
+#         }
+#     }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -137,4 +141,3 @@ STRIPE_PUBLIC_KEY = "secret"
 STRIPE_WEBHOOK_SECRET = "secret"
 
 AUTH_USER_MODEL = "customer.Customer"
-
