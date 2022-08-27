@@ -3,6 +3,10 @@ from django.db import models
 from customer.models import Customer
 
 
+class ImageItem(models.Model):
+    image = models.ImageField(null=True, blank=True)
+
+
 class Item(models.Model):
     SIZES_CHOICES = [('S', 'Small'), ('M', 'Medium'), ('L', 'Large')]
     CATEGORIES_CHOICES = [('M', 'Men'), ('W', 'Women'), ('Ch', 'Children')]
@@ -19,7 +23,7 @@ class Item(models.Model):
     colours = models.CharField(max_length=25, choices=FAVORITE_COLORS_CHOICES, null=True, blank=True)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    image = models.ImageField(null=True, blank=True)
+    image = models.OneToOneField(ImageItem, on_delete=models.CASCADE, null=True, blank=True)
     slug = models.SlugField(default='product')
     description = models.TextField(max_length=355, null=True, blank=True)
 
