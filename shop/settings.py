@@ -43,9 +43,9 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "store.middleware.OrderMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "store.middleware.OrderMiddleware",
 ]
 
 ROOT_URLCONF = "shop.urls"
@@ -81,7 +81,7 @@ DB_PORT = os.getenv("POSTGRES_PORT", "")
 DB_IS_AVIAL = all([DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_HOST, DB_PORT])
 
 POSTGRES_READY = str(os.environ.get("POSTGRES_READY")) == "1"
-HEROKU_READY = False
+HEROKU_READY = True
 
 if POSTGRES_READY:
     if HEROKU_READY:

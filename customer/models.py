@@ -40,6 +40,7 @@ class Customer(AbstractBaseUser):
         verbose_name='email address',
         max_length=255,
         unique=True,
+        default='anonym@ecommerce.com'
     )
     phone_number = PhoneNumberField()
     objects = CustomerManager()

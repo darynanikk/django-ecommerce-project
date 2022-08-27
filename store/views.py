@@ -62,8 +62,7 @@ def cart(request):
         order, created = Order.objects.get_or_create(customer=customer, ordered=False)
     else:
         device = request.COOKIES["device"]
-        customer_email = f'user_{device[:3]}@ecommerce.com'
-        customer, created = Customer.objects.get_or_create(device=device, email=customer_email)
+        customer, created = Customer.objects.get_or_create(device=device)
         order, created = Order.objects.get_or_create(customer=customer, ordered=False)
 
     if method != "GET":

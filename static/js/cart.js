@@ -2,6 +2,15 @@
 
 console.log("cart")
 const updateBtns = document.getElementsByClassName('update-cart')
+const checkouLink = document.getElementById('checkout-link')
+
+if (checkouLink) {
+    if (updateBtns.length === 0) {
+        checkouLink.classList.add('disabled')
+    } else {
+        checkouLink.classList.remove('disabled')
+    }
+        }
 
 for (let i = 0; i < updateBtns.length; i++) {
     updateBtns[i].addEventListener('click', function (e) {
