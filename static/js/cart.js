@@ -1,9 +1,10 @@
 "use strict"
+
 console.log("cart")
 const updateBtns = document.getElementsByClassName('update-cart')
 
 for (let i = 0; i < updateBtns.length; i++) {
-    updateBtns[i].addEventListener('click', function (e)  {
+    updateBtns[i].addEventListener('click', function (e) {
         e.preventDefault()
         const productId = this.dataset.product
         const action = this.dataset.action
@@ -11,28 +12,22 @@ for (let i = 0; i < updateBtns.length; i++) {
 
         console.log('Product:', productId, 'Quantity', quantity, 'Action:', action)
         console.log('USER', user)
-        if (user === "AnonymousUser") {
-            console.log("Not log in")
-        } else {
-            console.log("Authorized")
-
-            updateCart(productId, quantity, action)
-        }
+        updateCart(productId, quantity, action)
     })
 }
 
 
-function updateCart(productId, quantity, action){
-    console.log("User is logged in.")
+function updateCart(productId, quantity, action) {
     const url = '/cart/'
     let method = ''
-    let object = {
-        ProductId:productId,
-        Quantity:quantity,
+
+    const obj = {
+        ProductId: productId,
+        Quantity: quantity,
         Action: action
     }
 
-    switch (action){
+    switch (action) {
         case 'remove':
             method = 'DELETE'
             break;
@@ -44,12 +39,6 @@ function updateCart(productId, quantity, action){
             break
         default:
             method = 'GET'
-    }
-
-    const obj = {
-        ProductId:productId,
-        Quantity:quantity,
-        Action: action
     }
 
     const data = {

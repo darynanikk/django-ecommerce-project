@@ -26,7 +26,7 @@ class Cart:
         self.order_item.delete()
 
     def update_cart(self):
-        self.order_item.quantity = self.quantity
+        self.order_item.quantity += self.quantity
         self.order_item.save()
         self.order.items.add(self.order_item)
 

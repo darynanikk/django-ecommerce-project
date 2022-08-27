@@ -6,6 +6,9 @@ from customer.models import Customer
 class ImageItem(models.Model):
     image = models.ImageField(null=True, blank=True)
 
+    def __str__(self):
+        return self.image.name
+
 
 class Item(models.Model):
     SIZES_CHOICES = [('S', 'Small'), ('M', 'Medium'), ('L', 'Large')]
@@ -23,12 +26,16 @@ class Item(models.Model):
     colours = models.CharField(max_length=25, choices=FAVORITE_COLORS_CHOICES, null=True, blank=True)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    image = models.OneToOneField(ImageItem, on_delete=models.CASCADE, null=True, blank=True)
+    item_image = models.OneToOneField(ImageItem, on_delete=models.CASCADE, null=True, blank=True)
     slug = models.SlugField(default='product')
     description = models.TextField(max_length=355, null=True, blank=True)
 
     def __str__(self):
         return self.title
+
+    @property
+    def get_image_url(self):
+        return self.item_image.image.url
 
 
 class OrderItem(models.Model):

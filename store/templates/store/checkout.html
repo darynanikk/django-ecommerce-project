@@ -30,7 +30,7 @@
                       <option value="5">BG</option>
                     </select>
                       <div class="form-group row">
-                          {% if request.user == 'AnonymousUser' %}
+                          {% if request.user.is_anonymous %}
                     <div class="col-md-6">
                       <label for="c_fname" class="text-black"></label>
                       <input type="text" class="form-control" id="c_fname" name="c_fname" placeholder="First Name">
@@ -57,7 +57,7 @@
                       <input type="text" class="form-control" id="c_postal_zip" name="c_postal_zip" placeholder="Postal code / Zip">
                     </div>
                   </div>
-              {% if request.user == 'AnonymousUser' %}
+              {% if request.user.is_anonymous %}
                   <div class="form-group row mb-5">
                     <div class="col-md-6">
                       <label for="c_email_address" class="text-black"></label>
@@ -76,7 +76,7 @@
                     <p class="mb-3">Create an account by entering the information below. If you are a returning customer please login at the top of the page.</p>
                     <div class="form-group">
                       <label for="c_account_password" class="text-black">Account Password</label>
-                      <input type="email" class="form-control" id="c_account_password" name="c_account_password" placeholder="">
+                      <input type="password" class="form-control" id="c_account_password" name="c_account_password" placeholder="">
                     </div>
                   </div>
                 </div>

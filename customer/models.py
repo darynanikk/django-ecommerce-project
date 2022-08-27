@@ -40,12 +40,12 @@ class Customer(AbstractBaseUser):
         verbose_name='email address',
         max_length=255,
         unique=True,
-        default="customer@mail.com"
     )
     phone_number = PhoneNumberField()
     objects = CustomerManager()
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    device = models.CharField(max_length=200, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
 

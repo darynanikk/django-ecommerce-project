@@ -22,7 +22,7 @@
                      {% if order_item.quantity >= 0 %}
                         <tr>
                             <td class="product-thumbnail">
-                              <img src="{{ order_item.item.image.url }}" alt="Image" class="img-fluid">
+                              <img src="{{ order_item.item.get_image_url}}" alt="Image" class="img-fluid">
                             </td>
                             <td class="product-name">
                               <h2 class="h5 text-black">{{ order_item.item.title }}</h2>
@@ -100,7 +100,7 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12">
-                        <a  href="{% url 'store:checkout' %}" class="btn btn-primary btn-lg py-3 btn-block">Proceed To Checkout</a>
+                        <a  href="{% url 'store:checkout' %}" id='checkout-link' class="btn btn-primary btn-lg py-3 btn-block">Proceed To Checkout</a>
                   </div>
                 </div>
               </div>

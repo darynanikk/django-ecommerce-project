@@ -41,6 +41,7 @@ form.addEventListener("submit", function(event) {
     city: document.getElementById('c_state_country').value,
     street_address: document.getElementById('c_address').value,
     postal_code: document.getElementById('c_postal_zip').value,
+    password: document.getElementById('c_account_password').value
   }
   if (user === 'AnonymousUser') {
    data['email'] = `${document.getElementById('c_email').value}`

@@ -5,13 +5,13 @@ import os
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
+from customer.models import Customer
 from .cart import Cart
 from django.views.generic import ListView, DetailView, TemplateView
 from store.models import Item, Order, OrderItem
 from .filters import item_filter, ItemsFilter
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -58,15 +58,13 @@ def cart(request):
     context = {}
     method = request.method
     customer = request.user
-
     if customer.is_authenticated:
         order, created = Order.objects.get_or_create(customer=customer, ordered=False)
-
     else:
-        pass
-        # TODO handle later
         device = request.COOKIES["device"]
-        return JsonResponse({"cool": "cool"}, safe=False)
+        customer_email = f'user_{device[:3]}@ecommerce.com'
+        customer, created = Customer.objects.get_or_create(device=device, email=customer_email)
+        order, created = Order.objects.get_or_create(customer=customer, ordered=False)
 
     if method != "GET":
         data = json.loads(request.body)
@@ -102,18 +100,19 @@ def about(request):
     return render(request, "store/about.html", context)
 
 
-def contact(request):
-    context = {}
-    return render(request, "store/contact.html", context)
-
-
 class ProductCheckoutPageView(TemplateView):
     template_name = "store/checkout.html"
 
     def get_context_data(self, **kwargs):
         context = super(ProductCheckoutPageView, self).get_context_data(**kwargs)
         customer = self.request.user
-        order = Order.objects.get(customer=customer)
+        if customer.is_authenticated:
+            order = get_object_or_404(Customer, email=customer.email)
+        else:
+            device = self.request.COOKIES["device"]
+            customer = Customer.objects.get(device=device)
+            order = Order.objects.get(customer=customer)
+
         order_items = order.items.all()
         context.update(
             {
@@ -176,9 +175,9 @@ class StripeIntentView(View):
                 email = str(request.user)
             else:
                 email = data.get("email")
-            customer = stripe.Customer.create(email=email)
-            # if user is logged in
-            order = Order.objects.get(customer=request.user)
+
+            customer, created = stripe.Customer.get_or_create(email=email)
+            order = request.order
 
             shipping = {
                 "address": {
