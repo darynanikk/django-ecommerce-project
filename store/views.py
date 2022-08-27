@@ -24,13 +24,11 @@ class HomeListView(ListView):
     template_name = "store/main.html"
 
     def get_queryset(self):
-        item_qs = super(HomeListView, self).get_queryset()
-        try:
-            # TODO filter featured items (anonymous user\ registered)
-            featured_items = item_qs.filter(user=self.request)
-        except:
-            pass
-        return item_qs
+        order = super(HomeListView, self).get_queryset()[0]
+        if self.request.user.is_authenticated:
+            return order.items.filter(customer=self.request.user)
+        else:
+            return order.items.all()
 
 
 class ShopListView(View):
