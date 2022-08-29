@@ -25,7 +25,6 @@ class CustomerManager(BaseUserManager):
         user = self.create_user(
             email,
             password=password,
-            **extra_fields
         )
         user.is_admin = True
 
@@ -40,7 +39,6 @@ class Customer(AbstractBaseUser):
         verbose_name='email address',
         max_length=255,
         unique=True,
-        default='anonym@ecommerce.com'
     )
     phone_number = PhoneNumberField()
     objects = CustomerManager()

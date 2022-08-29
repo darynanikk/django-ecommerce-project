@@ -9,19 +9,15 @@ from store.models import Order
 class OrderMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        if request.user.is_authenticated:
-            try:
-                order = Order.objects.get(customer=request.user)
-                request.order = order
-                return
-            except Order.DoesNotExist:
-                print('customer does not make any order')
+        device_id = request.COOKIES.get('device')
+        try:
+            if request.user.is_authenticated:
+                order = get_object_or_404(Order, customer=request.user)
+            else:
+                customer, created = Customer.objects.get_or_create(device=device_id)
+                order = get_object_or_404(Order, customer=customer)
 
-        if request.user.is_anonymous:
-            try:
-                customer = get_object_or_404(Customer, email='anonym@ecommerce.com')
-                order = Order.objects.get(customer=customer)
-                request.order = order
-                return
-            except Http404:
-                print('anonymous customer does not make any order')
+            request.order = order
+        except Http404:
+            pass
+

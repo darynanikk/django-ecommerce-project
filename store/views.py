@@ -24,11 +24,13 @@ class HomeListView(ListView):
     template_name = "store/main.html"
 
     def get_queryset(self):
-        order = super(HomeListView, self).get_queryset()[0]
-        if self.request.user.is_authenticated:
-            return order.items.filter(customer=self.request.user)
-        else:
-            return order.items.all()
+        qs = super(HomeListView, self).get_queryset()
+
+        if qs.count() > 0:
+            if self.request.user.is_authenticated:
+                return qs[0].items.filter(customer=self.request.user)
+            else:
+                return qs[0].items.all()
 
 
 class ShopListView(View):
@@ -56,8 +58,10 @@ def cart(request):
     context = {}
     method = request.method
     customer = request.user
+
     if customer.is_authenticated:
         order, created = Order.objects.get_or_create(customer=customer, ordered=False)
+
     else:
         device = request.COOKIES["device"]
         customer, created = Customer.objects.get_or_create(device=device)
@@ -86,7 +90,6 @@ def cart(request):
             c.update_cart()
         elif method == "DELETE":
             c.remove_from_cart()
-
     context["order_items"] = order.items.all()
     context["order"] = order
     return render(request, "store/cart.html", context)
@@ -104,11 +107,11 @@ class ProductCheckoutPageView(TemplateView):
         context = super(ProductCheckoutPageView, self).get_context_data(**kwargs)
         customer = self.request.user
         if customer.is_authenticated:
-            order = get_object_or_404(Customer, email=customer.email)
+            order = get_object_or_404(Order, customer=customer)
         else:
             device = self.request.COOKIES["device"]
             customer = Customer.objects.get(device=device)
-            order = Order.objects.get(customer=customer)
+            order = get_object_or_404(Order, customer=customer)
 
         order_items = order.items.all()
         context.update(
