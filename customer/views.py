@@ -36,11 +36,8 @@ def register_user(request):
             customer = form.save(commit=False)
             password = form.cleaned_data.get('password1')
             customer.set_password(password)
-            customer = customer.save()
-
-            if customer is not None:
-                login(request, customer)
-                return redirect('customer:login')
+            customer.save()
+        return redirect('customer:login')
 
     context = {'form': form, 'page': page}
     return render(request, 'customer/login_register.html', context)
