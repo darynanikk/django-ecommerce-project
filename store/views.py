@@ -2,6 +2,7 @@ import json
 import stripe
 import os
 
+from django.contrib.auth import login, authenticate
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse
@@ -171,13 +172,31 @@ class StripeIntentView(View):
         try:
             body = request.body
             data = json.loads(body.decode("utf-8"))
-            if request.user.is_authenticated:
-                email = str(request.user)
-            else:
-                email = data.get("email")
-
-            customer, created = stripe.Customer.get_or_create(email=email)
+            email = data.get("email")
+            password = data.get("password")
+            phone_number = data.get("phone_number")
+            first_name = data.get("first_name")
+            last_name = data.get("last_name")
             order = request.order
+            if request.user.is_anonymous and password:
+                device_id = self.request.COOKIES['device']
+                Customer.objects.filter(device=device_id).update(
+                    email=email,
+                    phone_number=phone_number,
+                    first_name=first_name,
+                    last_name=last_name
+                )
+                customer = Customer.objects.get(email=email)
+                customer.set_password(password)
+                customer.save()
+                login(request, customer)
+
+            customer_qs = stripe.Customer.search(
+                query=f"email:'{email}'")['data']
+            if not customer_qs:
+                customer = stripe.Customer.create(email=email)
+            else:
+                customer = customer_qs[0]
 
             shipping = {
                 "address": {
@@ -187,8 +206,9 @@ class StripeIntentView(View):
                     "line1": data.get("street_address"),
                 },
                 "name": email,
-                "phone": data.get("phone_number"),
+                "phone": phone_number,
             }
+
             intent = stripe.PaymentIntent.create(
                 amount=int(order.get_cart_total_price),
                 currency="usd",

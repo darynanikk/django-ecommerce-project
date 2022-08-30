@@ -41,11 +41,13 @@ form.addEventListener("submit", function(event) {
     city: document.getElementById('c_state_country').value,
     street_address: document.getElementById('c_address').value,
     postal_code: document.getElementById('c_postal_zip').value,
-    password: document.getElementById('c_account_password').value
   }
   if (user === 'AnonymousUser') {
-   data['email'] = `${document.getElementById('c_email').value}`
+    data['email'] = `${document.getElementById('c_email').value}`
     data['phone_number'] = `${document.getElementById('c_phone').value}`
+    data['password'] = `${document.getElementById('c_account_password').value}`
+    data['first_name'] = `${document.getElementById('c_fname').value}`
+    data['last_name'] = `${document.getElementById('c_lname').value}`
   } else {
     data['email'] = user
     data['phone_number'] = customer_phone_number
