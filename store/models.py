@@ -92,7 +92,7 @@ class Address(models.Model):
                                  on_delete=models.SET_NULL, null=True, blank=True)
     street_address = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
-    zip = models.CharField(max_length=100)
+    zip = models.CharField(max_length=5)
     address = models.CharField(max_length=255)
 
     def __str__(self):

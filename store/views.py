@@ -13,6 +13,7 @@ from .cart import Cart
 from django.views.generic import ListView, DetailView, TemplateView
 from store.models import Item, Order, OrderItem
 from .filters import item_filter, ItemsFilter
+from .forms import CheckoutForm
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -115,12 +116,15 @@ class ProductCheckoutPageView(TemplateView):
             order = get_object_or_404(Order, customer=customer)
 
         order_items = order.items.all()
+        context = {
+            "STRIPE_PUBLIC_KEY": os.getenv("STRIPE_PUBLIC_KEY", ""),
+            "order": order,
+            "order_items": order_items,
+        }
+        if self.request.method == 'GET':
+            context['checkout_form'] = CheckoutForm(self.request)
         context.update(
-            {
-                "STRIPE_PUBLIC_KEY": os.getenv("STRIPE_PUBLIC_KEY", ""),
-                "order": order,
-                "order_items": order_items,
-            }
+           context
         )
         return context
 
@@ -203,7 +207,7 @@ class StripeIntentView(View):
                     "country": data.get("country"),
                     "city": data.get("city"),
                     "postal_code": data.get("postal_code"),
-                    "line1": data.get("street_address"),
+                    "line1": data.get("address"),
                 },
                 "name": email,
                 "phone": phone_number,

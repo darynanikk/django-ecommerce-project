@@ -37,20 +37,19 @@ form.addEventListener("submit", function(event) {
   event.preventDefault();
   const url = '/create-payment-intent/'
   let data = {
-    country: document.getElementById('c_country').value,
-    city: document.getElementById('c_state_country').value,
-    street_address: document.getElementById('c_address').value,
-    postal_code: document.getElementById('c_postal_zip').value,
+    country: document.getElementById('id_country').value,
+    city: document.getElementById('c_city').value,
+    address: document.getElementById('c_address').value,
+    phone_number: document.getElementById('c_phone').value,
+    postal_code: document.getElementById('c_zip').value,
   }
   if (user === 'AnonymousUser') {
-    data['email'] = `${document.getElementById('c_email').value}`
-    data['phone_number'] = `${document.getElementById('c_phone').value}`
-    data['password'] = `${document.getElementById('c_account_password').value}`
-    data['first_name'] = `${document.getElementById('c_fname').value}`
-    data['last_name'] = `${document.getElementById('c_lname').value}`
+    data['email'] = `${document.getElementById('email').value}`
+    data['password'] = `${document.getElementById('c_password').value}`
+    data['first_name'] = `${document.getElementById('f_name').value}`
+    data['last_name'] = `${document.getElementById('l_name').value}`
   } else {
     data['email'] = user
-    data['phone_number'] = customer_phone_number
   }
   // Complete payment when the submit button is clicked
   fetch(url, {
